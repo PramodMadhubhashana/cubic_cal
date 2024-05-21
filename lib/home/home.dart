@@ -1,3 +1,4 @@
+import 'package:cubic_cal/widget/add.dart';
 import 'package:cubic_cal/widget/totalcubic.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -20,6 +21,15 @@ class _HomeState extends State<Home> {
     "48 ↑",
     "60 ↑"
   ];
+
+  void _dataAddBottomsheet(BuildContext context) {
+    showModalBottomSheet(
+        context: context,
+        builder: (context) {
+          return const AddData();
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -31,7 +41,9 @@ class _HomeState extends State<Home> {
             color: Colors.white,
             alignment: Alignment.center,
             child: IconButton(
-              onPressed: () {},
+              onPressed: () {
+                _dataAddBottomsheet(context);
+              },
               icon: const Icon(Icons.add),
               color: Colors.black,
             ),
