@@ -14,6 +14,7 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   final List<String> category = [
+    "All",
     "24 ↓",
     "24 ↑",
     "30 ↑",
@@ -22,12 +23,22 @@ class _HomeState extends State<Home> {
     "60 ↑"
   ];
 
+  List<String> lengthAndRound = [];
+
   void _dataAddBottomsheet(BuildContext context) {
     showModalBottomSheet(
-        context: context,
-        builder: (context) {
-          return const AddData();
-        });
+      context: context,
+      builder: (context) {
+        return AddData(
+          onDataAdded: (String data) {
+            setState(() {
+              lengthAndRound.add(data);
+            });
+          },
+          initialData: lengthAndRound,
+        );
+      },
+    );
   }
 
   @override
@@ -56,11 +67,11 @@ class _HomeState extends State<Home> {
           Column(
             children: [
               Container(
-                margin: EdgeInsets.only(top: 20),
+                margin: const EdgeInsets.only(top: 20),
                 height: 200,
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
-                  itemCount: 06,
+                  itemCount: 7,
                   itemBuilder: (context, index) {
                     return (Column(
                       children: [
@@ -115,14 +126,14 @@ class _HomeState extends State<Home> {
                 height: 100,
                 color: Colors.cyan[100],
                 child: ListView.builder(
-                  itemCount: 06,
+                  itemCount: 7,
                   scrollDirection: Axis.horizontal,
                   itemBuilder: (context, index) {
                     return (Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Container(
-                          margin: EdgeInsets.all(10),
+                          margin: const EdgeInsets.all(10),
                           height: 60,
                           width: 60,
                           decoration: const BoxDecoration(
@@ -131,7 +142,9 @@ class _HomeState extends State<Home> {
                               ),
                               color: Color.fromARGB(255, 255, 255, 255)),
                           child: IconButton(
-                              onPressed: () {}, icon: Text(category[index])),
+                            onPressed: () {},
+                            icon: Text(category[index]),
+                          ),
                         )
                       ],
                     ));
@@ -146,7 +159,7 @@ class _HomeState extends State<Home> {
                 height: 500,
                 color: Colors.white,
                 child: ListView.builder(
-                  itemCount: 10,
+                  itemCount: lengthAndRound.length,
                   itemBuilder: (context, index) {
                     return (Container(
                       margin: const EdgeInsets.all(10),
@@ -160,12 +173,16 @@ class _HomeState extends State<Home> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            const Row(
+                            Row(
                               children: [
+                                Text("${index + 1}"),
+                                const SizedBox(
+                                  width: 20,
+                                ),
                                 Text(
-                                  "24 - 5 = 2.158 ",
-                                  style: TextStyle(
-                                    fontSize: 20,
+                                  lengthAndRound[index],
+                                  style: const TextStyle(
+                                    fontSize: 25,
                                   ),
                                 ),
                               ],

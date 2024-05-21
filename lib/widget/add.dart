@@ -1,12 +1,18 @@
+import 'dart:collection';
 import 'dart:ffi';
 
+import 'package:cubic_cal/widget/cuNoKeyboard.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:numeric_keyboard/numeric_keyboard.dart';
 
 class AddData extends StatefulWidget {
-  const AddData({super.key});
+  final Function(String data) onDataAdded;
+  final List<String> initialData;
+  const AddData(
+      {super.key, required this.onDataAdded, required this.initialData});
 
   @override
   State<AddData> createState() => _AddDataState();
@@ -14,11 +20,70 @@ class AddData extends StatefulWidget {
 
 class _AddDataState extends State<AddData> {
   String text = '';
+  List<String> lengthAndRound = [];
+  final ScrollController _scrollController = ScrollController();
 
   void _onKeyboardTap(String value) {
     setState(() {
-      text = text + value;
+      if (text.contains('-') && value == '-' || text == '' && value == '-') {
+        return;
+      } else {
+        text = text + value;
+      }
     });
+  }
+
+  void _onBackspace() {
+    setState(() {
+      if (text.isNotEmpty) {
+        text = text.substring(0, text.length - 1);
+      }
+    });
+  }
+
+  void _onClear() {
+    setState(() {
+      text = '';
+    });
+  }
+
+  void _addData() {
+    setState(() {
+      if (text == '0' || text == '-') {
+        text = '';
+        return;
+      } else {
+        final regExp = RegExp(r'^[1-9]\d*\s*-\s*[1-9]\d*$');
+        if (!regExp.hasMatch(text)) {
+          text = '';
+          return;
+        } else {
+          lengthAndRound.add(text);
+          widget.onDataAdded(text);
+          _scrollToBottom();
+        }
+      }
+      text = '';
+    });
+  }
+
+  void _scrollToBottom() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_scrollController.hasClients) {
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      }
+    });
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    lengthAndRound = List.from(widget.initialData);
   }
 
   @override
@@ -32,11 +97,12 @@ class _AddDataState extends State<AddData> {
             height: 80,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
-              itemCount: 100,
+              itemCount: lengthAndRound.length,
+              controller: _scrollController,
               itemBuilder: (context, index) {
                 return (Text(
-                  "$index",
-                  style: TextStyle(fontSize: 30),
+                  "${lengthAndRound[index]}" ",",
+                  style: const TextStyle(fontSize: 30),
                 ));
               },
             ),
@@ -44,24 +110,18 @@ class _AddDataState extends State<AddData> {
           TextField(
             keyboardType: TextInputType.none,
             controller: TextEditingController(text: text),
-            style: TextStyle(fontSize: 20),
-            maxLength: 10,
+            style: const TextStyle(fontSize: 20),
           ),
           const SizedBox(
             height: 10,
           ),
-          NumericKeyboard(
+          Expanded(
+              child: CustomNumericKeyboard(
             onKeyboardTap: _onKeyboardTap,
-            textColor: Colors.black,
-            rightButtonFn: () {},
-            rightIcon: const Icon(
-              Icons.backspace,
-              color: Colors.black,
-            ),
-            leftIcon: Icon(Icons.check_circle),
-            leftButtonFn: () {},
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          ),
+            onBackspace: _onBackspace,
+            onClear: _onClear,
+            addData: _addData,
+          ))
         ],
       ),
     ));
