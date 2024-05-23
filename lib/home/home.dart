@@ -1,6 +1,6 @@
 import 'package:cubic_cal/widget/add.dart';
 import 'package:cubic_cal/widget/details.dart';
-import 'package:cubic_cal/widget/totalcubic.dart';
+import 'package:cubic_cal/widget/cubicCalulate.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -30,6 +30,15 @@ class _HomeState extends State<Home> {
   List<String> thirtyToThirtySix = [];
   List<String> thirtySixToFourtyEight = [];
   List<String> fourtyEightToSixty = [];
+  List<String> sixtyToSeventyTwo = [];
+  int selectIndex = 0;
+  double total = 0.0;
+  double twentyFourD = 0.0;
+  double twentyForThirty = 0.0;
+  double thirtthirtySix = 0.0;
+  double thirtySixfourtyEight = 0.0;
+  double fourtyaEightsixty = 0.0;
+  double sixtySeventyTwo = 0.0;
 
   void _dataAddBottomsheet(BuildContext context) {
     showModalBottomSheet(
@@ -51,6 +60,8 @@ class _HomeState extends State<Home> {
                 thirtySixToFourtyEight.add(data);
               } else if (tmpRound >= 48 && tmpRound < 60) {
                 fourtyEightToSixty.add(data);
+              } else if (tmpRound >= 60 && tmpRound < 72) {
+                sixtyToSeventyTwo.add(data);
               }
             });
           },
@@ -62,28 +73,7 @@ class _HomeState extends State<Home> {
 
   void _chooseRound(int index) {
     setState(() {
-      switch (index) {
-        case 0:
-          // Display all
-          break;
-        case 1:
-          // Display items in twentyFourDown
-          break;
-        case 2:
-          // Display items in twentyFourToThirty
-          break;
-        case 3:
-          // Display items in thirtyToThirtySix
-          break;
-        case 4:
-          // Display items in thirtySixToFourtyEight
-          break;
-        case 5:
-          // Display items in fourtyEightToSixty
-          break;
-        default:
-          break;
-      }
+      selectIndex = index;
     });
   }
 
@@ -98,9 +88,34 @@ class _HomeState extends State<Home> {
     );
   }
 
-  Widget _datalist() {
+  Widget _datalList() {
+    List<String> displayList = [];
+    switch (selectIndex) {
+      case 0:
+        displayList = lengthAndRoundAll;
+        break;
+      case 1:
+        displayList = twentyFourDown;
+        break;
+      case 2:
+        displayList = twentyFourToThirty;
+        break;
+      case 3:
+        displayList = thirtyToThirtySix;
+        break;
+      case 4:
+        displayList = thirtySixToFourtyEight;
+        break;
+      case 5:
+        displayList = fourtyEightToSixty;
+        break;
+      case 6:
+        displayList = sixtyToSeventyTwo;
+      default:
+        break;
+    }
     return ListView.builder(
-      itemCount: lengthAndRoundAll.length,
+      itemCount: displayList.length,
       itemBuilder: (context, index) {
         return Container(
           margin: const EdgeInsets.all(10),
@@ -121,7 +136,7 @@ class _HomeState extends State<Home> {
                       width: 20,
                     ),
                     Text(
-                      lengthAndRoundAll[index],
+                      displayList[index],
                       style: const TextStyle(
                         fontSize: 25,
                       ),
@@ -169,7 +184,8 @@ class _HomeState extends State<Home> {
           ),
         ],
       ),
-      body: Column(
+      body: ListView(
+        scrollDirection: Axis.vertical,
         children: [
           Container(
             margin: const EdgeInsets.only(top: 20),
@@ -212,8 +228,7 @@ class _HomeState extends State<Home> {
                             const Text(
                               "552", // Sample text
                               style: TextStyle(
-                                  fontSize: 25,
-                                  fontWeight: FontWeight.w600),
+                                  fontSize: 25, fontWeight: FontWeight.w600),
                             ),
                           ],
                         ),
@@ -241,17 +256,22 @@ class _HomeState extends State<Home> {
                       margin: const EdgeInsets.all(10),
                       height: 60,
                       width: 60,
-                      decoration: const BoxDecoration(
-                        borderRadius: BorderRadius.all(
+                      decoration: BoxDecoration(
+                        borderRadius: const BorderRadius.all(
                           Radius.circular(10),
                         ),
-                        color: Color.fromARGB(255, 255, 255, 255),
+                        color: index == selectIndex
+                            ? Colors.amber[200]
+                            : Colors.amber[50],
                       ),
                       child: IconButton(
                         onPressed: () {
                           _chooseRound(index);
                         },
-                        icon: Text(category[index]),
+                        icon: Text(
+                          category[index],
+                          style: TextStyle(fontWeight: FontWeight.w600),
+                        ),
                       ),
                     )
                   ],
@@ -262,9 +282,15 @@ class _HomeState extends State<Home> {
           const SizedBox(
             height: 50,
           ),
-          Expanded(
-            child: _datalist(),
-          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(
+                height: 650,
+                child: _datalList(),
+              )
+            ],
+          )
         ],
       ),
     );
