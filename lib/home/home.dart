@@ -24,21 +24,25 @@ class _HomeState extends State<Home> {
     "60 ↑"
   ];
 
-  List<String> lengthAndRoundAll = [];
-  List<String> twentyFourDown = [];
-  List<String> twentyFourToThirty = [];
-  List<String> thirtyToThirtySix = [];
-  List<String> thirtySixToFourtyEight = [];
-  List<String> fourtyEightToSixty = [];
-  List<String> sixtyToSeventyTwo = [];
+  final Map<String, List<String>> categorizedData = {
+    "All": [],
+    "24 ↓": [],
+    "24 ↑": [],
+    "30 ↑": [],
+    "36 ↑": [],
+    "48 ↑": [],
+    "60 ↑": []
+  };
+  final Map<String, double> totalCubic = {
+    "All": 0.0,
+    "24 ↓": 0.0,
+    "24 ↑": 0.0,
+    "30 ↑": 0.0,
+    "36 ↑": 0.0,
+    "48 ↑": 0.0,
+    "60 ↑": 0.0
+  };
   int selectIndex = 0;
-  double total = 0.0;
-  double twentyFourD = 0.0;
-  double twentyForThirty = 0.0;
-  double thirtthirtySix = 0.0;
-  double thirtySixfourtyEight = 0.0;
-  double fourtyaEightsixty = 0.0;
-  double sixtySeventyTwo = 0.0;
 
   void _dataAddBottomsheet(BuildContext context) {
     showModalBottomSheet(
@@ -48,27 +52,37 @@ class _HomeState extends State<Home> {
           onDataAdded: (String data) {
             List<String> temp = data.split("-");
             int tmpRound = int.parse(temp[1]);
+            String categoryKey = _getCategoryKey(tmpRound);
+            double tempvalue = CubicCalulate.cubicCal(data);
             setState(() {
-              lengthAndRoundAll.add(data);
-              if (tmpRound < 24) {
-                twentyFourDown.add(data);
-              } else if (tmpRound >= 24 && tmpRound < 30) {
-                twentyFourToThirty.add(data);
-              } else if (tmpRound >= 30 && tmpRound < 36) {
-                thirtyToThirtySix.add(data);
-              } else if (tmpRound >= 36 && tmpRound < 48) {
-                thirtySixToFourtyEight.add(data);
-              } else if (tmpRound >= 48 && tmpRound < 60) {
-                fourtyEightToSixty.add(data);
-              } else if (tmpRound >= 60 && tmpRound < 72) {
-                sixtyToSeventyTwo.add(data);
-              }
+              categorizedData["All"]!.add(data);
+              categorizedData[categoryKey]!.add(data);
+              totalCubic["All"] = totalCubic["All"]! + tempvalue;
+              totalCubic[categoryKey] = totalCubic[categoryKey]! + tempvalue;
             });
           },
-          initialData: lengthAndRoundAll,
+          initialData: categorizedData["All"]!,
         );
       },
     );
+  }
+
+  String _getCategoryKey(int round) {
+    if (round < 24) {
+      return "24 ↓";
+    } else if (round >= 24 && round < 30) {
+      return "24 ↑";
+    } else if (round >= 30 && round < 36) {
+      return "30 ↑";
+    } else if (round >= 36 && round < 48) {
+      return "36 ↑";
+    } else if (round >= 48 && round < 60) {
+      return "48 ↑";
+    } else if (round >= 60 && round < 72) {
+      return "60 ↑";
+    } else {
+      return "";
+    }
   }
 
   void _chooseRound(int index) {
@@ -82,7 +96,7 @@ class _HomeState extends State<Home> {
       context: context,
       builder: (context) {
         return Details(
-          lengthAndRound: lengthAndRoundAll[index],
+          lengthAndRound: categorizedData[category[selectIndex]]![index],
         );
       },
     );
@@ -92,25 +106,25 @@ class _HomeState extends State<Home> {
     List<String> displayList = [];
     switch (selectIndex) {
       case 0:
-        displayList = lengthAndRoundAll;
+        displayList = categorizedData["All"]!;
         break;
       case 1:
-        displayList = twentyFourDown;
+        displayList = categorizedData["24 ↓"]!;
         break;
       case 2:
-        displayList = twentyFourToThirty;
+        displayList = categorizedData["24 ↑"]!;
         break;
       case 3:
-        displayList = thirtyToThirtySix;
+        displayList = categorizedData["30 ↑"]!;
         break;
       case 4:
-        displayList = thirtySixToFourtyEight;
+        displayList = categorizedData["36 ↑"]!;
         break;
       case 5:
-        displayList = fourtyEightToSixty;
+        displayList = categorizedData["48 ↑"]!;
         break;
       case 6:
-        displayList = sixtyToSeventyTwo;
+        displayList = categorizedData["60 ↑"]!;
       default:
         break;
     }
@@ -136,7 +150,7 @@ class _HomeState extends State<Home> {
                       width: 20,
                     ),
                     Text(
-                      displayList[index],
+                      "${displayList[index]} = ${CubicCalulate.cubicCal(displayList[index])}",
                       style: const TextStyle(
                         fontSize: 25,
                       ),
@@ -225,9 +239,9 @@ class _HomeState extends State<Home> {
                             const SizedBox(
                               height: 20,
                             ),
-                            const Text(
-                              "552", // Sample text
-                              style: TextStyle(
+                            Text(
+                              totalCubic[category[index]]!.toStringAsFixed(1),
+                              style: const TextStyle(
                                   fontSize: 25, fontWeight: FontWeight.w600),
                             ),
                           ],

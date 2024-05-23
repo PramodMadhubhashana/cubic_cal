@@ -1,3 +1,4 @@
+import 'package:cubic_cal/widget/cubicCalulate.dart';
 import 'package:flutter/cupertino.dart';
 
 class Details extends StatefulWidget {
@@ -57,9 +58,9 @@ class _DetailsState extends State<Details> {
             const SizedBox(
               height: 50,
             ),
-            const Text(
-              "Cubic Value : ",
-              style: TextStyle(
+            Text(
+              "Cubic Value : ${CubicCalulate.cubicCal(widget.lengthAndRound)}",
+              style: const TextStyle(
                 fontSize: 22,
               ),
             ),
